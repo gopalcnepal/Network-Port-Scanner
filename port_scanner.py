@@ -1,6 +1,6 @@
 # Program Name: port_scanner.py
 
-# import necessary module
+# Import necessary module
 import os
 import socket
 import argparse
