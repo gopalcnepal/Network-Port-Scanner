@@ -34,7 +34,6 @@ remote_host = parser_args.rhost
 ports = parser_args.port
 ports_range = parser_args.range
 banner = parser_args.banner
-file_name = parser_args.file
 
 # If user selects the range option. Replace the default ports and use range instead
 if ports_range != None:
