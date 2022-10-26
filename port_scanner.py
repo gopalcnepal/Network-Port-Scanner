@@ -39,9 +39,18 @@ banner = parser_args.banner
 if ports_range != None:
     ports = list(range(ports_range[0], ports_range[1]+1))
 
+# Resolve the host name from entered IP Address.
+try:
+    host_name = socket.gethostbyaddr(remote_host)
+except:
+    pass
+
 # Add Banner
 print("-" * 50)
 print("Scanning Target: " + remote_host)
+if host_name != '':
+    print("Host Name: " + host_name[0])
+
 print("Scanning started at: " + str(datetime.now()))
 print("-" * 50)
 
