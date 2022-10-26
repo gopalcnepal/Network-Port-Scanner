@@ -1,4 +1,5 @@
 # Program Name: port_scanner.py
+# Version: 1.5
 
 # Import necessary module
 import os
@@ -42,8 +43,10 @@ if ports_range != None:
 # Resolve the host name from entered IP Address.
 try:
     host_name = socket.gethostbyaddr(remote_host)
-except:
-    pass
+    
+except Exception as e:
+    # Get the error name as the host_name if it could not be resolved.
+    host_name = ([str(e).split('] ')[1]])
 
 # Add Banner
 print("-" * 50)
@@ -51,36 +54,46 @@ print("Scanning Target: " + remote_host)
 if host_name != '':
     print("Host Name: " + host_name[0])
 
-print("Scanning started at: " + str(datetime.now()))
+scan_start_time = datetime.now()
+print("Scanning started at: " + str(scan_start_time))
 print("-" * 50)
 
 # Socket used to connect to remote host and port
 try:
      
-    # will scan ports in the list
+    # Print Header for the Output
+    if banner:
+        print("\nPORT \t STATUS \t SERVICE \t BANNER \n")
+    else:
+        print("\nPORT \t STATUS \t SERVICE \n ")
+
+    # Scan all the ports in the list
     for port in ports:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        socket.setdefaulttimeout(1)
+        socket.setdefaulttimeout(0.5)
          
         # returns an error indicator
         result = s.connect_ex((remote_host,int(port)))
         if result == 0:
+            # Get the Service Name running on given Port
+            service_name = socket.getservbyport(int(port))
+            
             # Checks if banner flag is set to true
             if banner:
                 try:
                     # Get the banner information
                     banner = s.recv(1024).decode()
-                    print("Port: {} is open with banner: {}".format(port, banner))
+                    print("{} \t OPEN \t {} \t {}".format(port, service_name, banner.strip()))
         
                 except:
-                    print("Port: {} is open ".format(port))
+                    print("{} \t OPEN \t {}".format(port, service_name))
             else:
-                print("Port: {} is open ".format(port))
+                print("{} \t OPEN ".format(port))
 
         s.close()
          
 except KeyboardInterrupt:
-        print("\n Exiting Program !!!!")
+        print("\n Program Interrupted. Exiting Program !!!!")
         sys.exit()
 except socket.gaierror:
         print("\n Hostname Could Not Be Resolved !!!!")
@@ -88,3 +101,8 @@ except socket.gaierror:
 except socket.error:
         print("\ Server not responding !!!!")
         sys.exit()
+
+scan_end_time = datetime.now()
+print("\nIt took {} seconds to scan {} ports.\n".format(
+    str((scan_end_time - scan_start_time).seconds), len(ports))
+    )
